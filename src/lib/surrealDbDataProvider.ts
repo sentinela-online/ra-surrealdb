@@ -180,7 +180,11 @@ SELECT count(${target}) FROM ${id} ${filters} GROUP ALL;`;
         } else {
           const { id, data } = params;
           const result = await db.update(id.toString(), data);
-          return { data: result as unknown as RecordType };
+          if (result.length === 1) {
+            return { data: result[0] as unknown as RecordType };
+          } else {
+            return { data: {} as RecordType };
+          }          
         }
       } catch (e) {
         console.error('Error in getUpdate: ', e); // eslint-disable-line no-console
