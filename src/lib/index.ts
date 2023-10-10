@@ -116,7 +116,8 @@ export const useRaSurrealDb = ({
   queries,
 }: RaSurrealDbOption): RaSurrealDbAuthProviderOptions =>
   useMemo(() => {
-    const surrealdb = new Surreal(url);
+    const surrealdb = new Surreal();
+    surrealdb.connect(url, {});
 
     return {
       surrealdb,
