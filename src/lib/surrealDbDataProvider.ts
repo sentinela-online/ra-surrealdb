@@ -23,6 +23,12 @@ import {
 import { type QueryResult, type RawQueryResult } from 'surrealdb.js/script/types';
 import { type RaSurrealDb } from '.';
 
+// https://dmitripavlutin.com/react-usecallback/
+// https://react.dev/reference/react
+// https://dev.to/chukwuma1976/information-flow-in-react-making-a-callback-to-children-and-giving-them-props-2h52
+// https://stackoverflow.com/questions/74244673/usedataprovider-hook-for-custom-methods
+// https://marmelab.com/react-admin/useDataProvider.html
+
 export const surrealDbDataProvider = <
   ResourceType extends string = string,
   RecordType extends RaRecord & RawQueryResult = any
@@ -56,8 +62,7 @@ export const surrealDbDataProvider = <
           const filters = filtersClauses.length === 0 ? '' : 'WHERE ' + filtersClauses.join(' AND ');
           const [data, count]: [QueryResult<RecordType[]>, QueryResult<Array<{ count: number }>>] =
             await db.query(
-              `SELECT * FROM type::table($resource) ${filters} ORDER BY ${field} ${order} LIMIT ${perPage} START ${
-                (page - 1) * perPage
+              `SELECT * FROM type::table($resource) ${filters} ORDER BY ${field} ${order} LIMIT ${perPage} START ${(page - 1) * perPage
               }; SELECT count() FROM type::table($resource) ${filters} GROUP ALL; `,
               { resource }
             );
@@ -110,7 +115,7 @@ export const surrealDbDataProvider = <
           const [data]: [QueryResult<RecordType[]>] = await db.query(
             `SELECT * FROM type::table($resource) WHERE id INSIDE $ids;`,
             { resource, ids }
-          );
+          ); sda
 
           return { data: data.result ?? [] };
         }
@@ -146,9 +151,8 @@ export const surrealDbDataProvider = <
             ([key, value]) => ` ${key} ~ "${value as string}"`
           );
           const filters = filtersClauses.length === 0 ? '' : 'WHERE ' + filtersClauses.join(' AND ');
-          const query = `SELECT ${target}.*.* as data , ${target}.${field} FROM ${id} ${filters} ORDER BY ${target}.${field} ${order} LIMIT ${perPage} START ${
-            (page - 1) * perPage
-          };
+          const query = `SELECT ${target}.*.* as data , ${target}.${field} FROM ${id} ${filters} ORDER BY ${target}.${field} ${order} LIMIT ${perPage} START ${(page - 1) * perPage
+            };
 SELECT count(${target}) FROM ${id} ${filters} GROUP ALL;`;
 
           const [data, count]: [QueryResult<RecordType[]>, QueryResult<Array<{ count: number }>>] =
@@ -184,7 +188,7 @@ SELECT count(${target}) FROM ${id} ${filters} GROUP ALL;`;
             return { data: result[0] as unknown as RecordType };
           } else {
             return { data: {} as RecordType };
-          }          
+          }
         }
       } catch (e) {
         console.error('Error in getUpdate: ', e); // eslint-disable-line no-console
@@ -287,4 +291,5 @@ SELECT count(${target}) FROM ${id} ${filters} GROUP ALL;`;
       }
     },
   } as DataProvider<ResourceType>;
+
 };
